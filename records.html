@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}All Records - MedWaste Tracker{% endblock %}
+
+{% block content %}
+  <div class="page-title">All Waste Records</div>
+  <div class="page-subtitle">Complete log of collected & disposed medical waste</div>
+
+  <form class="search-box" method="GET" action="{{ url_for('records') }}">
+    <input type="text" name="q" value="{{ search }}" placeholder="Search by staff ID, name, category, or location...">
+    <button type="submit" class="btn">Search</button>
+    {% if search %}
+      <a href="{{ url_for('records') }}" class="btn btn-secondary">Clear</a>
+    {% endif %}
+  </form>
+
+  <div class="card">
+    {% if records %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date/Time</th>
+          <th>Category</th>
+          <th>Bin Color</th>
+          <th>Qty (kg)</th>
+          <th>Source</th>
+          <th>Collected By</th>
+          <th>Disposed By</th>
+          <th>Disposal Location</th>
+          <th>Remarks</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td>{{ r.id }}</td>
+          <td>{{ r.record_datetime }}</td>
+          <td>{{ r.waste_category }}</td>
+          <td>
+            <span class="badge badge-{{ r.bin_color|lower }}">
+              <span class="dot"></span>{{ r.bin_color }}
+            </span>
+          </td>
+          <td>{{ r.quantity_kg }}</td>
+          <td>{{ r.source_location }}</td>
+          <td>{{ r.collector_name }}<br><small>ID: {{ r.collector_staff_id }}</small></td>
+          <td>{{ r.disposer_name }}<br><small>ID: {{ r.disposer_staff_id }}</small></td>
+          <td>{{ r.disposal_location or "-" }}</td>
+          <td>{{ r.remarks or "-" }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('delete_record', record_id=r.id) }}"
+                  onsubmit="return confirm('Delete this record?');">
+              <button type="submit" class="btn btn-danger" style="padding:6px 12px; font-size:0.8rem;">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="empty-state">No records found{% if search %} for "<strong>{{ search }}</strong>"{% endif %}.</div>
+    {% endif %}
+  </div>
+
+  <a href="{{ url_for('add_record') }}" class="btn">+ Add New Record</a>
+{% endblock %}

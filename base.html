@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Medical Waste Management{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">&#9851;</span> MedWaste Tracker</div>
+    <nav>
+      <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+      <a href="{{ url_for('add_record') }}" class="{% if request.endpoint == 'add_record' %}active{% endif %}">Add Record</a>
+      <a href="{{ url_for('records') }}" class="{% if request.endpoint == 'records' %}active{% endif %}">All Records</a>
+    </nav>
+    <div class="system-status" aria-label="System online">
+      <span class="system-status-dot" aria-hidden="true"></span>
+      SYSTEM ONLINE
+    </div>
+  </div>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+</body>
+</html>

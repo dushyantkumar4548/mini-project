@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - MedWaste Tracker{% endblock %}
+
+{% block content %}
+  <div class="page-title">Dashboard</div>
+  <div class="page-subtitle">Overview of medical waste collection & disposal activity</div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="value">{{ total_records }}</div>
+      <div class="label">Total Records Logged</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">{{ total_qty }} kg</div>
+      <div class="label">Total Waste Recorded</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">{{ categories|length }}</div>
+      <div class="label">Waste Categories Tracked</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Waste Color-Code Legend</h3>
+    <div class="legend">
+      {% for cat, info in categories.items() %}
+        <div class="legend-item">
+          <span class="legend-swatch" style="background: {{ info.hex }};"></span>
+          {{ cat }} &rarr; <strong>{{ info.color }} bin</strong>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Waste by Category</h3>
+    {% if by_category %}
+    <table>
+      <thead>
+        <tr><th>Category</th><th>Bin Color</th><th>Entries</th><th>Total Qty (kg)</th></tr>
+      </thead>
+      <tbody>
+        {% for row in by_category %}
+        <tr>
+          <td>{{ row.waste_category }}</td>
+          <td>
+            <span class="badge badge-{{ row.bin_color|lower }}">
+              <span class="dot"></span>{{ row.bin_color }}
+            </span>
+          </td>
+          <td>{{ row.cnt }}</td>
+          <td>{{ "%.2f"|format(row.qty) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="empty-state">No waste records yet. Click "Add Record" to log the first entry.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3>Recent Records</h3>
+    {% if records %}
+    <table>
+      <thead>
+        <tr>
+          <th>Date/Time</th><th>Waste Category</th><th>Bin</th><th>Qty (kg)</th>
+          <th>Collected By</th><th>Disposed By</th><th>Disposal Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td>{{ r.record_datetime }}</td>
+          <td>{{ r.waste_category }}</td>
+          <td>
+            <span class="badge badge-{{ r.bin_color|lower }}">
+              <span class="dot"></span>{{ r.bin_color }}
+            </span>
+          </td>
+          <td>{{ r.quantity_kg }}</td>
+          <td>{{ r.collector_name }} ({{ r.collector_staff_id }})</td>
+          <td>{{ r.disposer_name }} ({{ r.disposer_staff_id }})</td>
+          <td>{{ r.disposal_location or "-" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="form-actions">
+      <a href="{{ url_for('records') }}" class="btn btn-secondary">View All Records</a>
+    </div>
+    {% else %}
+      <div class="empty-state">Nothing here yet.</div>
+    {% endif %}
+  </div>
+
+{% endblock %}
